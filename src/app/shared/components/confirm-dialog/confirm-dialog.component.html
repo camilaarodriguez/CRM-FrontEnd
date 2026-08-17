@@ -1,0 +1,47 @@
+@if (aberto()) {
+  <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow-4-strong border-0">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title fw-bold">
+            <i class="fas fa-triangle-exclamation text-danger me-2"></i>{{ titulo() }}
+          </h5>
+          <button type="button" class="btn-close" aria-label="Fechar" (click)="cancelar.emit()"></button>
+        </div>
+
+        <div class="modal-body py-4">
+          <p class="mb-1">
+            {{ mensagem() }}
+            @if (destaque()) {
+              <strong>{{ destaque() }}</strong>
+            }?
+          </p>
+          @if (complemento()) {
+            <p class="text-muted small mb-0">{{ complemento() }}</p>
+          }
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button
+            type="button"
+            class="btn btn-light"
+            data-mdb-ripple-init
+            (click)="cancelar.emit()"
+          >
+            {{ textoCancelar() }}
+          </button>
+          <button
+            type="button"
+            class="btn {{ classeConfirmar() }}"
+            data-mdb-ripple-init
+            (click)="confirmar.emit()"
+          >
+            <i class="fas fa-trash me-2"></i>{{ textoConfirmar() }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show"></div>
+}
