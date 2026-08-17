@@ -1,0 +1,90 @@
+<section class="login-page d-flex align-items-center justify-content-center min-vh-100">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
+        <div class="card shadow-5-strong border-0">
+          <div class="card-body p-4 p-lg-5">
+            <div class="text-center mb-4">
+              <div class="login-page__icone bg-primary text-white shadow-3 mx-auto mb-3">
+                <i class="fas fa-chart-line fa-2x"></i>
+              </div>
+              <h3 class="fw-bold mb-1">CRM Angular</h3>
+              <p class="text-muted mb-0">Acesse sua conta para gerenciar os clientes</p>
+            </div>
+
+            @if (erroLogin()) {
+              <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="fas fa-circle-exclamation me-2"></i>
+                E-mail ou senha inválidos
+              </div>
+            }
+
+            <form [formGroup]="form" (ngSubmit)="entrar()" novalidate>
+              <div class="form-outline mb-1">
+                <input
+                  type="email"
+                  id="email"
+                  class="form-control"
+                  formControlName="email"
+                  [class.is-invalid]="email.touched && email.invalid"
+                  autocomplete="username"
+                />
+                <label class="form-label" for="email">E-mail</label>
+              </div>
+              @if (email.touched && email.invalid) {
+                <p class="text-danger small mb-3">
+                  <i class="fas fa-circle-exclamation me-1"></i>
+                  @if (email.hasError('required')) {
+                    O e-mail é obrigatório.
+                  } @else {
+                    Informe um e-mail válido.
+                  }
+                </p>
+              } @else {
+                <div class="mb-3"></div>
+              }
+
+              <div class="form-outline mb-1">
+                <input
+                  type="password"
+                  id="senha"
+                  class="form-control"
+                  formControlName="senha"
+                  [class.is-invalid]="senha.touched && senha.invalid"
+                  autocomplete="current-password"
+                />
+                <label class="form-label" for="senha">Senha</label>
+              </div>
+              @if (senha.touched && senha.invalid) {
+                <p class="text-danger small mb-3">
+                  <i class="fas fa-circle-exclamation me-1"></i>
+                  @if (senha.hasError('required')) {
+                    A senha é obrigatória.
+                  } @else {
+                    A senha deve ter no mínimo 6 caracteres.
+                  }
+                </p>
+              } @else {
+                <div class="mb-3"></div>
+              }
+
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg btn-block w-100 shadow-3"
+                data-mdb-ripple-init
+                [disabled]="form.invalid"
+              >
+                <i class="fas fa-right-to-bracket me-2"></i>Entrar
+              </button>
+            </form>
+
+            <div class="alert alert-light border mt-4 mb-0 small" role="alert">
+              <i class="fas fa-circle-info text-primary me-1"></i>
+              Acesso de demonstração: <strong>admin&#64;crm.com</strong> / <strong>123456</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
