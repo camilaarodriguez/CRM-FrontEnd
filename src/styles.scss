@@ -1,0 +1,34 @@
+/* Estilos globais — a base visual vem do MDB carregado por CDN no index.html */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #f5f7fb;
+  font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  color: #303030;
+}
+
+/* Impede o scroll do fundo enquanto o modal de confirmação está aberto */
+body:has(.modal.show) {
+  overflow: hidden;
+}
+
+/*
+ * O autofill do navegador preenche o campo sem disparar evento de digitação.
+ * Esta animação vazia serve só de gatilho: o `animationstart` avisa a diretiva
+ * do MDB para subir o label, em vez de deixá-lo por cima do texto preenchido.
+ */
+@keyframes mdb-autofill {
+  from {
+    /* sem efeito visual */
+  }
+}
+
+.form-outline .form-control:-webkit-autofill {
+  animation-name: mdb-autofill;
+  animation-duration: 1ms;
+}
