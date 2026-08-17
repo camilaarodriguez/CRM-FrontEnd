@@ -1,0 +1,27 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-3 sticky-top">
+  <div class="container-fluid px-3 px-lg-4">
+    <a class="navbar-brand fw-bold d-flex align-items-center" routerLink="/clientes">
+      <i class="fas fa-chart-line me-2"></i>
+      CRM Angular
+    </a>
+
+    <div class="d-flex align-items-center ms-auto">
+      @if (usuario(); as logado) {
+        <span class="text-white me-3 d-none d-sm-flex align-items-center">
+          <i class="fas fa-user-circle fa-lg me-2"></i>
+          {{ logado.nome }}
+          <span class="badge bg-light text-primary ms-2">{{ logado.role }}</span>
+        </span>
+      }
+
+      <button
+        type="button"
+        class="btn btn-light btn-sm btn-rounded"
+        data-mdb-ripple-init
+        (click)="sair()"
+      >
+        <i class="fas fa-right-from-bracket me-1"></i>Sair
+      </button>
+    </div>
+  </div>
+</nav>

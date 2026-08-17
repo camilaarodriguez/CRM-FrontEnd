@@ -3,6 +3,12 @@ import { Routes } from '@angular/router';
 /** Rotas da área de clientes, carregadas sob demanda a partir da rota pai. */
 export const CLIENTES_ROUTES: Routes = [
   {
+    path: '',
+    title: 'Clientes',
+    loadComponent: () =>
+      import('./cliente-list/cliente-list.component').then((m) => m.ClienteListComponent)
+  },
+  {
     path: 'novo',
     title: 'Novo cliente',
     loadComponent: () =>

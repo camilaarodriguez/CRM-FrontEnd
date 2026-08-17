@@ -1,0 +1,20 @@
+<div class="main-layout d-flex flex-column min-vh-100">
+  <app-navbar />
+
+  <div class="container-fluid flex-grow-1 px-0">
+    <div class="row g-0 h-100">
+      <div class="col-12 col-md-4 col-lg-3 col-xl-2">
+        <app-sidebar />
+      </div>
+
+      <main class="col-12 col-md-8 col-lg-9 col-xl-10 p-3 p-lg-4">
+        <!-- as telas de clientes são renderizadas aqui -->
+        <router-outlet />
+      </main>
+    </div>
+  </div>
+
+  <footer class="text-center text-muted small py-3 bg-white border-top">
+    CRM Angular · dados mockados em memória
+  </footer>
+</div>
