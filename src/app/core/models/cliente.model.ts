@@ -1,24 +1,60 @@
-import { StatusFunil } from './status-funil.enum';
+import { StatusFunil } from './enums/status-funil.enum';
 
-/** Espelha o ClienteResponseDTO da API. */
+/** Espelha ClienteResponseDTO */
 export interface Cliente {
   id: number;
   nome: string;
-  email: string;
-  telefone?: string;
+  email: string | null;
+  telefone: string;
+  documento: string | null;
+  empresa: string | null;
+  observacoes: string | null;
   vendedorId: number;
   vendedorNome: string;
   statusFunil: StatusFunil;
   ativo: boolean;
-  criadoEm: Date;
-  atualizadoEm: Date;
+  criadoEm: string;
+  atualizadoEm: string | null;
 }
 
-/**
- * Espelha o ClienteCreateDTO: o vínculo com o vendedor é enviado por id, e
- * vendedorNome, ativo e as datas são resolvidos do outro lado.
- */
-export type NovoCliente = Omit<
-  Cliente,
-  'id' | 'vendedorNome' | 'ativo' | 'criadoEm' | 'atualizadoEm'
->;
+/** Espelha ClienteCreateDTO */
+export interface ClienteCreate {
+  nome: string;
+  email?: string | null;
+  telefone: string;
+  documento?: string | null;
+  empresa?: string | null;
+  observacoes?: string | null;
+  vendedorId: number;
+  statusFunil?: StatusFunil;
+}
+
+/** Espelha ClienteUpdateDTO */
+export interface ClienteUpdate {
+  nome: string;
+  email?: string | null;
+  telefone: string;
+  documento?: string | null;
+  empresa?: string | null;
+  observacoes?: string | null;
+  vendedorId: number;
+}
+
+/** Espelha ClienteStatusFunilDTO */
+export interface ClienteStatusFunil {
+  statusFunil: StatusFunil;
+}
+
+/** Espelha ClienteReatribuirDTO */
+export interface ClienteReatribuir {
+  novoVendedorId: number;
+  motivo?: string | null;
+}
+
+/** Filtros de GET /api/clientes */
+export interface ClienteFiltro {
+  busca?: string;
+  status?: StatusFunil | null;
+  vendedorId?: number | null;
+  incluirInativos?: boolean;
+}
