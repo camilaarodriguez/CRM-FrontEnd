@@ -5,3 +5,7 @@
 .navbar-brand {
   letter-spacing: 0.5px;
 }
+
+.dropdown-toggle::after {
+  margin-left: 0.4rem;
+}
