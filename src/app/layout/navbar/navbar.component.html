@@ -1,27 +1,47 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-3 sticky-top">
   <div class="container-fluid px-3 px-lg-4">
+    <button
+      type="button"
+      class="btn btn-link text-white d-lg-none px-2 me-1"
+      aria-label="Abrir menu"
+      (click)="alternarMenu.emit()"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+
     <a class="navbar-brand fw-bold d-flex align-items-center" routerLink="/clientes">
-      <i class="fas fa-chart-line me-2"></i>
-      CRM Angular
+      <i class="fas fa-chart-line me-2"></i>CRM
     </a>
 
-    <div class="d-flex align-items-center ms-auto">
+    <div class="ms-auto d-flex align-items-center">
       @if (usuario(); as logado) {
-        <span class="text-white me-3 d-none d-sm-flex align-items-center">
-          <i class="fas fa-user-circle fa-lg me-2"></i>
-          {{ logado.nome }}
-          <span class="badge bg-light text-primary ms-2">{{ logado.role }}</span>
-        </span>
-      }
+        <div class="dropdown" mdbDropdown>
+          <button
+            class="btn btn-link text-white dropdown-toggle d-flex align-items-center"
+            type="button"
+            mdbDropdownToggle
+          >
+            <i class="fas fa-circle-user fa-lg me-2"></i>
+            <span class="d-none d-sm-inline">{{ logado.nome }}</span>
+          </button>
 
-      <button
-        type="button"
-        class="btn btn-light btn-sm btn-rounded"
-        data-mdb-ripple-init
-        (click)="sair()"
-      >
-        <i class="fas fa-right-from-bracket me-1"></i>Sair
-      </button>
+          <ul mdbDropdownMenu class="dropdown-menu dropdown-menu-end">
+            <li class="px-3 py-2">
+              <p class="fw-bold mb-0">{{ logado.nome }}</p>
+              <small class="text-muted d-block">{{ logado.email }}</small>
+              <span class="badge {{ roleMeta[logado.role].classeBadge }} mt-2">
+                {{ roleMeta[logado.role].rotulo }}
+              </span>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <button type="button" class="dropdown-item" (click)="sair()">
+                <i class="fas fa-right-from-bracket me-2"></i>Sair
+              </button>
+            </li>
+          </ul>
+        </div>
+      }
     </div>
   </div>
 </nav>

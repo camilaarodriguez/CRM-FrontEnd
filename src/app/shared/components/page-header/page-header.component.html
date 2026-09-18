@@ -1,14 +1,11 @@
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4">
-  <div class="page-header__titulo">
-    <h3 class="fw-bold mb-1">
-      <i class="{{ icone() }} text-primary me-2"></i>{{ titulo() }}
-    </h3>
+  <div>
+    <h4 class="fw-bold mb-1"><i class="{{ icone() }} text-primary me-2"></i>{{ titulo() }}</h4>
     @if (subtitulo()) {
       <p class="text-muted mb-0">{{ subtitulo() }}</p>
     }
   </div>
-
-  <div class="page-header__acoes mt-3 mt-md-0">
+  <div class="mt-3 mt-md-0 d-flex gap-2 flex-wrap">
     <ng-content />
   </div>
 </div>

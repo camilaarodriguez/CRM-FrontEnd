@@ -8,20 +8,20 @@
               <div class="login-page__icone bg-primary text-white shadow-3 mx-auto mb-3">
                 <i class="fas fa-chart-line fa-2x"></i>
               </div>
-              <h3 class="fw-bold mb-1">CRM Angular</h3>
-              <p class="text-muted mb-0">Acesse sua conta para gerenciar os clientes</p>
+              <h4 class="fw-bold mb-1">CRM</h4>
+              <p class="text-muted mb-0">Acesse para gerenciar clientes e atendimentos</p>
             </div>
 
-            @if (erroLogin()) {
+            @if (mensagemErro()) {
               <div class="alert alert-danger d-flex align-items-center" role="alert">
-                <i class="fas fa-circle-exclamation me-2"></i>
-                E-mail ou senha inválidos
+                <i class="fas fa-circle-exclamation me-2"></i>{{ mensagemErro() }}
               </div>
             }
 
             <form [formGroup]="form" (ngSubmit)="entrar()" novalidate>
-              <div class="form-outline mb-1">
+              <mdb-form-control class="mb-1">
                 <input
+                  mdbInput
                   type="email"
                   id="email"
                   class="form-control"
@@ -29,8 +29,8 @@
                   [class.is-invalid]="email.touched && email.invalid"
                   autocomplete="username"
                 />
-                <label class="form-label" for="email">E-mail</label>
-              </div>
+                <label mdbLabel class="form-label" for="email">E-mail</label>
+              </mdb-form-control>
               @if (email.touched && email.invalid) {
                 <p class="text-danger small mb-3">
                   <i class="fas fa-circle-exclamation me-1"></i>
@@ -44,8 +44,9 @@
                 <div class="mb-3"></div>
               }
 
-              <div class="form-outline mb-1">
+              <mdb-form-control class="mb-1">
                 <input
+                  mdbInput
                   type="password"
                   id="senha"
                   class="form-control"
@@ -53,8 +54,8 @@
                   [class.is-invalid]="senha.touched && senha.invalid"
                   autocomplete="current-password"
                 />
-                <label class="form-label" for="senha">Senha</label>
-              </div>
+                <label mdbLabel class="form-label" for="senha">Senha</label>
+              </mdb-form-control>
               @if (senha.touched && senha.invalid) {
                 <p class="text-danger small mb-3">
                   <i class="fas fa-circle-exclamation me-1"></i>
@@ -70,17 +71,47 @@
 
               <button
                 type="submit"
-                class="btn btn-primary btn-lg btn-block w-100 shadow-3"
-                data-mdb-ripple-init
-                [disabled]="form.invalid"
+                class="btn btn-primary btn-lg w-100 shadow-3"
+                mdbRipple
+                [disabled]="form.invalid || enviando()"
               >
-                <i class="fas fa-right-to-bracket me-2"></i>Entrar
+                @if (enviando()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Entrando...
+                } @else {
+                  <i class="fas fa-right-to-bracket me-2"></i>Entrar
+                }
               </button>
             </form>
 
-            <div class="alert alert-light border mt-4 mb-0 small" role="alert">
-              <i class="fas fa-circle-info text-primary me-1"></i>
-              Acesso de demonstração: <strong>admin&#64;crm.com</strong> / <strong>123456</strong>
+            <div class="alert alert-light border mt-4 mb-0">
+              <p class="small fw-bold mb-2">
+                <i class="fas fa-circle-info text-primary me-1"></i>Acessos de demonstração
+                <span class="text-muted fw-normal">(senha 123456)</span>
+              </p>
+              <div class="d-flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm btn-demo"
+                  (click)="preencherDemonstracao('admin@crm.com')"
+                >
+                  Administrador
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm btn-demo"
+                  (click)="preencherDemonstracao('marcos.teixeira@crm.com')"
+                >
+                  Gerente
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm btn-demo"
+                  (click)="preencherDemonstracao('ana.moraes@crm.com')"
+                >
+                  Vendedora
+                </button>
+              </div>
             </div>
           </div>
         </div>

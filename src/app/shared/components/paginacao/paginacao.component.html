@@ -1,0 +1,29 @@
+@if (totalPaginas() > 1) {
+  <nav class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-3 border-top">
+    <small class="text-muted">
+      Página {{ paginaAtual() + 1 }} de {{ totalPaginas() }} · {{ totalRegistros() }} registro(s)
+    </small>
+
+    <ul class="pagination pagination-circle mb-0">
+      <li class="page-item" [class.disabled]="primeira()">
+        <button type="button" class="page-link" mdbRipple (click)="anterior()" [disabled]="primeira()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </li>
+
+      @for (pagina of paginas(); track pagina) {
+        <li class="page-item" [class.active]="pagina === paginaAtual()">
+          <button type="button" class="page-link" mdbRipple (click)="irPara(pagina)">
+            {{ pagina + 1 }}
+          </button>
+        </li>
+      }
+
+      <li class="page-item" [class.disabled]="ultima()">
+        <button type="button" class="page-link" mdbRipple (click)="proxima()" [disabled]="ultima()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </li>
+    </ul>
+  </nav>
+}
