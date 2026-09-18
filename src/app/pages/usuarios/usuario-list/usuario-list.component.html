@@ -1,0 +1,151 @@
+<app-page-header
+  titulo="Equipe"
+  subtitulo="Perfis de acesso e disponibilidade dos vendedores"
+  icone="fas fa-user-gear"
+>
+  <button type="button" class="btn btn-primary shadow-3" mdbRipple (click)="abrirFormulario(null)">
+    <i class="fas fa-user-plus me-2"></i>Novo integrante
+  </button>
+</app-page-header>
+
+<div class="card shadow-2 border-0 mb-4">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="fas fa-magnifying-glass text-primary"></i>
+          </span>
+          <input
+            type="search"
+            class="form-control border-start-0"
+            placeholder="Buscar por nome ou e-mail..."
+            aria-label="Buscar integrantes"
+            [formControl]="campoBusca"
+          />
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <select
+          class="form-select"
+          aria-label="Filtrar por perfil"
+          (change)="mudarRole($any($event.target).value)"
+        >
+          <option value="">Todos os perfis</option>
+          @for (opcao of roleOpcoes; track opcao.valor) {
+            <option [value]="opcao.valor">{{ opcao.rotulo }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <select
+          class="form-select"
+          aria-label="Filtrar por situação"
+          (change)="mudarSituacao($any($event.target).value)"
+        >
+          <option value="">Ativos e inativos</option>
+          <option value="true">Somente ativos</option>
+          <option value="false">Somente inativos</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-2 border-0">
+  @if (carregando()) {
+    <app-carregando mensagem="Carregando equipe..." />
+  } @else if (pagina().empty) {
+    <app-estado-vazio
+      titulo="Nenhum integrante encontrado"
+      descricao="Ajuste os filtros ou cadastre um novo integrante."
+      icone="fas fa-user-slash"
+    />
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-4">Integrante</th>
+            <th scope="col">Perfil</th>
+            <th scope="col">Situação</th>
+            <th scope="col">Desde</th>
+            <th scope="col" class="text-end pe-4">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of pagina().content; track usuario.id) {
+            <tr>
+              <td class="ps-4">
+                <span class="fw-bold d-block">{{ usuario.nome }}</span>
+                <small class="text-muted">{{ usuario.email }}</small>
+              </td>
+              <td>
+                <span class="badge {{ roleMeta[usuario.role].classeBadge }}">
+                  {{ roleMeta[usuario.role].rotulo }}
+                </span>
+              </td>
+              <td>
+                @if (usuario.ativo) {
+                  <span class="text-success fw-bold small">
+                    <i class="fas fa-circle-check me-1"></i>Ativo
+                  </span>
+                } @else {
+                  <span class="text-muted fw-bold small">
+                    <i class="fas fa-circle-minus me-1"></i>Inativo
+                  </span>
+                }
+              </td>
+              <td>
+                <small class="text-muted">{{ usuario.criadoEm | date: 'dd/MM/yyyy' }}</small>
+              </td>
+              <td class="text-end pe-4 text-nowrap">
+                <button
+                  type="button"
+                  class="btn btn-link btn-floating btn-sm text-primary"
+                  title="Editar"
+                  aria-label="Editar integrante"
+                  mdbRipple
+                  (click)="abrirFormulario(usuario)"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-link btn-floating btn-sm"
+                  [class.text-success]="!usuario.ativo"
+                  [class.text-warning]="usuario.ativo"
+                  [title]="usuario.ativo ? 'Desativar' : 'Reativar'"
+                  aria-label="Alternar situação"
+                  mdbRipple
+                  (click)="alternarSituacao(usuario)"
+                >
+                  <i class="fas" [class.fa-user-slash]="usuario.ativo" [class.fa-user-check]="!usuario.ativo"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-link btn-floating btn-sm text-danger"
+                  title="Excluir"
+                  aria-label="Excluir integrante"
+                  mdbRipple
+                  (click)="excluir(usuario)"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-paginacao
+      [paginaAtual]="pagina().number"
+      [totalPaginas]="pagina().totalPages"
+      [totalRegistros]="pagina().totalElements"
+      (mudarPagina)="irParaPagina($event)"
+    />
+  }
+</div>

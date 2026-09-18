@@ -1,0 +1,104 @@
+<app-page-header
+  titulo="Conversas"
+  subtitulo="Fila de atendimento dos clientes por canal de mensagens"
+  icone="fas fa-comments"
+>
+  @if (totalNaoLidas() > 0) {
+    <span class="badge badge-danger align-self-center">
+      <i class="fas fa-bell me-1"></i>{{ totalNaoLidas() }} não lida(s)
+    </span>
+  }
+</app-page-header>
+
+@if (podeVerTodas()) {
+  <div class="card shadow-2 border-0 mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-12 col-md-5">
+          <label class="form-label fw-bold small mb-1" for="filtroVendedor">
+            Filtrar por vendedor
+          </label>
+          <select
+            id="filtroVendedor"
+            class="form-select"
+            (change)="mudarVendedor($any($event.target).value)"
+          >
+            <option value="">Toda a operação</option>
+            @for (vendedor of vendedores(); track vendedor.id) {
+              <option [value]="vendedor.id" [selected]="filtroVendedor() === vendedor.id">
+                {{ vendedor.nome }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="card shadow-2 border-0">
+  @if (carregando()) {
+    <app-carregando mensagem="Carregando conversas..." />
+  } @else if (pagina().empty) {
+    <app-estado-vazio
+      titulo="Nenhuma conversa por aqui"
+      descricao="As conversas são abertas automaticamente quando um cliente é cadastrado."
+      icone="fas fa-comment-slash"
+    />
+  } @else {
+    <div class="list-group list-group-flush">
+      @for (conversa of pagina().content; track conversa.id) {
+        <button
+          type="button"
+          class="list-group-item list-group-item-action py-3 px-4 conversa"
+          mdbRipple
+          (click)="abrir(conversa)"
+        >
+          <div class="d-flex align-items-center gap-3">
+            <div class="avatar bg-primary text-white flex-shrink-0">
+              {{ conversa.clienteNome.charAt(0) }}
+            </div>
+
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex justify-content-between align-items-center gap-2">
+                <span class="fw-bold text-truncate">{{ conversa.clienteNome }}</span>
+                <small class="text-muted flex-shrink-0">
+                  @if (conversa.ultimaMensagemEm) {
+                    {{ conversa.ultimaMensagemEm | date: 'dd/MM HH:mm' }}
+                  } @else {
+                    sem mensagens
+                  }
+                </small>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center gap-2 mt-1">
+                <small class="text-muted text-truncate">
+                  <i class="fas fa-user-tie me-1"></i>
+                  {{ conversa.vendedorNome || 'Sem responsável' }}
+                </small>
+
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                  <span class="badge {{ statusMeta[conversa.status].classeBadge }}">
+                    {{ statusMeta[conversa.status].rotulo }}
+                  </span>
+                  @if (conversa.naoLidas > 0) {
+                    <span class="badge badge-danger rounded-pill">{{ conversa.naoLidas }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <i class="fas fa-chevron-right text-muted flex-shrink-0"></i>
+          </div>
+        </button>
+      }
+    </div>
+
+    <app-paginacao
+      [paginaAtual]="pagina().number"
+      [totalPaginas]="pagina().totalPages"
+      [totalRegistros]="pagina().totalElements"
+      (mudarPagina)="irParaPagina($event)"
+    />
+  }
+</div>

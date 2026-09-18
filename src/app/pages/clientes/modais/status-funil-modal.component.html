@@ -1,0 +1,45 @@
+<div class="modal-header">
+  <h5 class="modal-title fw-bold">
+    <i class="fas fa-diagram-project text-primary me-2"></i>Mover no funil
+  </h5>
+  <button type="button" class="btn-close" aria-label="Fechar" (click)="cancelar()"></button>
+</div>
+
+<div class="modal-body">
+  <p class="text-muted">
+    Cliente <strong class="text-body">{{ cliente.nome }}</strong>. Etapa atual:
+    <span class="badge {{ meta[etapaAtual()].classeBadge }}">{{ meta[etapaAtual()].rotulo }}</span>
+  </p>
+
+  <div class="d-grid gap-2 mt-4">
+    @for (opcao of opcoes; track opcao.valor) {
+      <button
+        type="button"
+        class="btn text-start etapa"
+        mdbRipple
+        [class.btn-light]="selecionado() !== opcao.valor"
+        [class.btn-primary]="selecionado() === opcao.valor"
+        [disabled]="opcao.valor === etapaAtual()"
+        (click)="escolher(opcao.valor)"
+      >
+        <i class="{{ opcao.icone }} me-2"></i>{{ opcao.rotulo }}
+        @if (opcao.valor === etapaAtual()) {
+          <span class="badge bg-light text-muted float-end">etapa atual</span>
+        }
+      </button>
+    }
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" mdbRipple (click)="cancelar()">Cancelar</button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    mdbRipple
+    [disabled]="selecionado() === null"
+    (click)="confirmar()"
+  >
+    <i class="fas fa-check me-2"></i>Confirmar
+  </button>
+</div>

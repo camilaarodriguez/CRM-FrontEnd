@@ -1,0 +1,97 @@
+<div class="modal-header">
+  <h5 class="modal-title fw-bold">
+    <i class="fas fa-user-gear text-primary me-2"></i>
+    {{ edicao ? 'Editar integrante' : 'Novo integrante' }}
+  </h5>
+  <button type="button" class="btn-close" aria-label="Fechar" (click)="cancelar()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="form">
+    <mdb-form-control class="mb-1">
+      <input
+        mdbInput
+        type="text"
+        id="nomeUsuario"
+        class="form-control"
+        maxlength="150"
+        formControlName="nome"
+        [class.is-invalid]="enviado() && nome.invalid"
+      />
+      <label mdbLabel class="form-label" for="nomeUsuario">Nome *</label>
+    </mdb-form-control>
+    @if (enviado() && nome.invalid) {
+      <p class="text-danger small mb-3">
+        <i class="fas fa-circle-exclamation me-1"></i>O nome é obrigatório.
+      </p>
+    } @else {
+      <div class="mb-3"></div>
+    }
+
+    <mdb-form-control class="mb-1">
+      <input
+        mdbInput
+        type="email"
+        id="emailUsuario"
+        class="form-control"
+        maxlength="150"
+        formControlName="email"
+        [class.is-invalid]="enviado() && email.invalid"
+      />
+      <label mdbLabel class="form-label" for="emailUsuario">E-mail *</label>
+    </mdb-form-control>
+    @if (enviado() && email.invalid) {
+      <p class="text-danger small mb-3">
+        <i class="fas fa-circle-exclamation me-1"></i>Informe um e-mail válido.
+      </p>
+    } @else {
+      <div class="mb-3"></div>
+    }
+
+    @if (!edicao) {
+      <mdb-form-control class="mb-1">
+        <input
+          mdbInput
+          type="password"
+          id="senhaUsuario"
+          class="form-control"
+          formControlName="senha"
+          [class.is-invalid]="enviado() && senha.invalid"
+        />
+        <label mdbLabel class="form-label" for="senhaUsuario">Senha *</label>
+      </mdb-form-control>
+      @if (enviado() && senha.invalid) {
+        <p class="text-danger small mb-3">
+          <i class="fas fa-circle-exclamation me-1"></i>A senha deve ter no mínimo 6 caracteres.
+        </p>
+      } @else {
+        <div class="mb-3"></div>
+      }
+    }
+
+    <label class="form-label fw-bold" for="roleUsuario">Perfil de acesso *</label>
+    <select
+      id="roleUsuario"
+      class="form-select"
+      formControlName="role"
+      [class.is-invalid]="enviado() && role.invalid"
+    >
+      <option [ngValue]="null" disabled>Selecione o perfil</option>
+      @for (opcao of opcoesRole; track opcao.valor) {
+        <option [ngValue]="opcao.valor">{{ opcao.rotulo }}</option>
+      }
+    </select>
+    @if (enviado() && role.invalid) {
+      <p class="text-danger small mt-1 mb-0">
+        <i class="fas fa-circle-exclamation me-1"></i>Escolha o perfil de acesso.
+      </p>
+    }
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" mdbRipple (click)="cancelar()">Cancelar</button>
+  <button type="button" class="btn btn-primary" mdbRipple (click)="confirmar()">
+    <i class="fas fa-floppy-disk me-2"></i>Salvar
+  </button>
+</div>

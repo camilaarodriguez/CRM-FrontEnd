@@ -1,0 +1,7 @@
+.etapa {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:disabled {
+    opacity: 0.65;
+  }
+}

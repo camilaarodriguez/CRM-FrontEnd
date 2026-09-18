@@ -1,0 +1,62 @@
+<div class="modal-header">
+  <h5 class="modal-title fw-bold">
+    <i class="fas fa-id-card text-primary me-2"></i>Ficha do cliente
+  </h5>
+  <button type="button" class="btn-close" aria-label="Fechar" (click)="fechar()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
+    <div>
+      <h5 class="fw-bold mb-1">{{ cliente.nome }}</h5>
+      <p class="text-muted mb-0">{{ cliente.empresa || 'Sem empresa informada' }}</p>
+    </div>
+    <div class="text-end">
+      <span class="badge {{ meta[cliente.statusFunil].classeBadge }}">
+        <i class="{{ meta[cliente.statusFunil].icone }} me-1"></i>
+        {{ meta[cliente.statusFunil].rotulo }}
+      </span>
+      @if (!cliente.ativo) {
+        <span class="badge badge-light text-muted border ms-1">inativo</span>
+      }
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-12 col-md-6">
+      <small class="text-muted d-block">Telefone</small>
+      <span class="fw-bold">{{ cliente.telefone }}</span>
+    </div>
+    <div class="col-12 col-md-6">
+      <small class="text-muted d-block">E-mail</small>
+      <span class="fw-bold">{{ cliente.email || '—' }}</span>
+    </div>
+    <div class="col-12 col-md-6">
+      <small class="text-muted d-block">Documento</small>
+      <span class="fw-bold">{{ cliente.documento || '—' }}</span>
+    </div>
+    <div class="col-12 col-md-6">
+      <small class="text-muted d-block">Responsável</small>
+      <span class="fw-bold">{{ cliente.vendedorNome }}</span>
+    </div>
+    <div class="col-12">
+      <small class="text-muted d-block">Observações</small>
+      <p class="mb-0">{{ cliente.observacoes || 'Nenhuma observação registrada.' }}</p>
+    </div>
+    <div class="col-12 col-md-6">
+      <small class="text-muted d-block">Cadastrado em</small>
+      <span>{{ cliente.criadoEm | date: 'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <div class="col-12 col-md-6">
+      <small class="text-muted d-block">Última atualização</small>
+      <span>{{ (cliente.atualizadoEm | date: 'dd/MM/yyyy HH:mm') || '—' }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" mdbRipple (click)="fechar()">Fechar</button>
+  <button type="button" class="btn btn-primary" mdbRipple (click)="editar()">
+    <i class="fas fa-pen me-2"></i>Editar cadastro
+  </button>
+</div>

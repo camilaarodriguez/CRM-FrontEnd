@@ -1,0 +1,125 @@
+@if (carregando()) {
+  <div class="card shadow-2 border-0">
+    <app-carregando mensagem="Abrindo atendimento..." />
+  </div>
+} @else if (naoEncontrada()) {
+  <div class="card shadow-2 border-0">
+    <div class="card-body text-center py-5">
+      <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+      <h6 class="fw-bold mb-1">Conversa não encontrada</h6>
+      <p class="text-muted mb-4">Ela pode ter sido removida junto com o cliente.</p>
+      <button type="button" class="btn btn-primary" mdbRipple (click)="voltar()">
+        <i class="fas fa-arrow-left me-2"></i>Voltar para as conversas
+      </button>
+    </div>
+  </div>
+} @else {
+  @if (conversa(); as atual) {
+  <div class="card shadow-2 border-0 chat">
+    <div class="card-header bg-white d-flex align-items-center gap-3 py-3">
+      <button
+        type="button"
+        class="btn btn-link btn-floating btn-sm text-muted"
+        aria-label="Voltar"
+        mdbRipple
+        (click)="voltar()"
+      >
+        <i class="fas fa-arrow-left"></i>
+      </button>
+
+      <div class="avatar bg-primary text-white">{{ atual.clienteNome.charAt(0) }}</div>
+
+      <div class="flex-grow-1 min-w-0">
+        <p class="fw-bold mb-0 text-truncate">{{ atual.clienteNome }}</p>
+        <small class="text-muted">
+          <i class="fas fa-user-tie me-1"></i>{{ atual.vendedorNome || 'Sem responsável' }}
+        </small>
+      </div>
+
+      <div class="text-end">
+        <span class="badge {{ statusMeta[atual.status].classeBadge }}">
+          {{ statusMeta[atual.status].rotulo }}
+        </span>
+        <a class="d-block small mt-1" [routerLink]="['/clientes/editar', atual.clienteId]">
+          Ver cadastro
+        </a>
+      </div>
+    </div>
+
+    <div #painelMensagens class="card-body chat__painel">
+      @if (mensagens().length === 0) {
+        <div class="text-center text-muted py-5">
+          <i class="fas fa-comment-dots fa-2x mb-3 d-block"></i>
+          Nenhuma mensagem trocada ainda. Envie a primeira abaixo.
+        </div>
+      } @else {
+        @for (mensagem of mensagens(); track mensagem.id) {
+          <div
+            class="d-flex mb-3"
+            [class.justify-content-end]="mensagem.direcao === Direcao.SAIDA"
+          >
+            <div
+              class="balao"
+              [class.balao--saida]="mensagem.direcao === Direcao.SAIDA"
+              [class.balao--entrada]="mensagem.direcao === Direcao.ENTRADA"
+            >
+              <p class="mb-1">{{ mensagem.conteudo }}</p>
+
+              <div class="d-flex align-items-center justify-content-end gap-2">
+                <small class="balao__hora">{{ mensagem.criadoEm | date: 'dd/MM HH:mm' }}</small>
+                @if (mensagem.direcao === Direcao.SAIDA && mensagem.statusEntrega) {
+                  <i class="{{ iconeDoStatus(mensagem.statusEntrega) }} small"></i>
+                }
+              </div>
+
+              @if (mensagem.enviadaPorNome) {
+                <small class="balao__autor d-block">por {{ mensagem.enviadaPorNome }}</small>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="card-footer bg-white py-3">
+      @if (conversaFechada()) {
+        <div class="alert alert-light border mb-0 text-center">
+          <i class="fas fa-lock text-muted me-2"></i>
+          Esta conversa está fechada e não aceita novas mensagens.
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="enviar()" class="row g-2 align-items-center">
+          <div class="col">
+            <mdb-form-control>
+              <input
+                mdbInput
+                type="text"
+                id="conteudo"
+                class="form-control"
+                formControlName="conteudo"
+                autocomplete="off"
+              />
+              <label mdbLabel class="form-label" for="conteudo">Escreva uma mensagem</label>
+            </mdb-form-control>
+          </div>
+
+          <div class="col-auto">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              mdbRipple
+              [disabled]="form.invalid || enviando()"
+            >
+              @if (enviando()) {
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+              } @else {
+                <i class="fas fa-paper-plane"></i>
+              }
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+}
+  }
