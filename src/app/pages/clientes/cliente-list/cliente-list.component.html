@@ -1,0 +1,208 @@
+<app-page-header
+  titulo="Clientes"
+  subtitulo="Carteira, funil de vendas e distribuição entre vendedores"
+  icone="fas fa-users"
+>
+  <a class="btn btn-primary shadow-3" routerLink="/clientes/novo" mdbRipple>
+    <i class="fas fa-plus me-2"></i>Novo cliente
+  </a>
+</app-page-header>
+
+<div class="card shadow-2 border-0 mb-4">
+  <div class="card-body">
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-lg-4">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="fas fa-magnifying-glass text-primary"></i>
+          </span>
+          <input
+            type="search"
+            class="form-control border-start-0"
+            placeholder="Buscar por nome ou e-mail..."
+            aria-label="Buscar clientes"
+            [formControl]="campoBusca"
+          />
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <select
+          class="form-select"
+          aria-label="Filtrar por etapa do funil"
+          (change)="mudarStatus($any($event.target).value)"
+        >
+          <option value="">Todas as etapas</option>
+          @for (opcao of statusOpcoes; track opcao.valor) {
+            <option [value]="opcao.valor" [selected]="filtroStatus() === opcao.valor">
+              {{ opcao.rotulo }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <select
+          class="form-select"
+          aria-label="Filtrar por vendedor"
+          (change)="mudarVendedor($any($event.target).value)"
+        >
+          <option value="">Todos os vendedores</option>
+          @for (vendedor of vendedores(); track vendedor.id) {
+            <option [value]="vendedor.id" [selected]="filtroVendedor() === vendedor.id">
+              {{ vendedor.nome }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="col-12 col-lg-2 d-flex align-items-center justify-content-lg-end gap-3">
+        <div class="form-check">
+          <input
+            mdbCheckbox
+            class="form-check-input"
+            type="checkbox"
+            id="incluirInativos"
+            [checked]="incluirInativos()"
+            (change)="alternarInativos($any($event.target).checked)"
+          />
+          <label class="form-check-label small" for="incluirInativos">Inativos</label>
+        </div>
+
+        @if (temFiltro()) {
+          <button type="button" class="btn btn-light btn-sm" mdbRipple (click)="limparFiltros()">
+            <i class="fas fa-eraser"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-2 border-0">
+  @if (carregando()) {
+    <app-carregando mensagem="Buscando clientes..." />
+  } @else if (pagina().empty) {
+    <app-estado-vazio
+      titulo="Nenhum cliente encontrado"
+      descricao="Ajuste os filtros ou cadastre um novo cliente para começar."
+      icone="fas fa-user-slash"
+    >
+      @if (temFiltro()) {
+        <button type="button" class="btn btn-outline-primary" mdbRipple (click)="limparFiltros()">
+          <i class="fas fa-eraser me-2"></i>Limpar filtros
+        </button>
+      } @else {
+        <a class="btn btn-primary" routerLink="/clientes/novo" mdbRipple>
+          <i class="fas fa-plus me-2"></i>Cadastrar o primeiro cliente
+        </a>
+      }
+    </app-estado-vazio>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-4">Cliente</th>
+            <th scope="col">Contato</th>
+            <th scope="col">Etapa</th>
+            <th scope="col">Responsável</th>
+            <th scope="col">Atualizado</th>
+            <th scope="col" class="text-end pe-4">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cliente of pagina().content; track cliente.id) {
+            <tr>
+              <td class="ps-4">
+                <span class="fw-bold d-block cursor-pointer" (click)="abrirDetalhes(cliente)">
+                  {{ cliente.nome }}
+                  @if (!cliente.ativo) {
+                    <span class="badge badge-light text-muted border ms-1">inativo</span>
+                  }
+                </span>
+                <small class="text-muted">{{ cliente.empresa || 'Sem empresa' }}</small>
+              </td>
+              <td>
+                <span class="d-block">{{ cliente.telefone }}</span>
+                <small class="text-muted">{{ cliente.email || '—' }}</small>
+              </td>
+              <td>
+                <span class="badge {{ statusMeta[cliente.statusFunil].classeBadge }}">
+                  <i class="{{ statusMeta[cliente.statusFunil].icone }} me-1"></i>
+                  {{ statusMeta[cliente.statusFunil].rotulo }}
+                </span>
+              </td>
+              <td>{{ cliente.vendedorNome }}</td>
+              <td>
+                <small class="text-muted">
+                  {{ (cliente.atualizadoEm || cliente.criadoEm) | date: 'dd/MM/yyyy' }}
+                </small>
+              </td>
+              <td class="text-end pe-4 text-nowrap">
+                <button
+                  type="button"
+                  class="btn btn-link btn-floating btn-sm text-info"
+                  title="Ver ficha"
+                  aria-label="Ver ficha do cliente"
+                  mdbRipple
+                  (click)="abrirDetalhes(cliente)"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-link btn-floating btn-sm text-success"
+                  title="Mover no funil"
+                  aria-label="Mover no funil"
+                  mdbRipple
+                  (click)="abrirFunil(cliente)"
+                >
+                  <i class="fas fa-diagram-project"></i>
+                </button>
+                @if (podeDistribuir()) {
+                  <button
+                    type="button"
+                    class="btn btn-link btn-floating btn-sm text-warning"
+                    title="Reatribuir"
+                    aria-label="Reatribuir cliente"
+                    mdbRipple
+                    (click)="abrirReatribuicao(cliente)"
+                  >
+                    <i class="fas fa-people-arrows"></i>
+                  </button>
+                }
+                <a
+                  class="btn btn-link btn-floating btn-sm text-primary"
+                  title="Editar"
+                  aria-label="Editar cliente"
+                  mdbRipple
+                  [routerLink]="['/clientes/editar', cliente.id]"
+                >
+                  <i class="fas fa-pen"></i>
+                </a>
+                <button
+                  type="button"
+                  class="btn btn-link btn-floating btn-sm text-danger"
+                  title="Excluir"
+                  aria-label="Excluir cliente"
+                  mdbRipple
+                  (click)="excluir(cliente)"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-paginacao
+      [paginaAtual]="pagina().number"
+      [totalPaginas]="pagina().totalPages"
+      [totalRegistros]="pagina().totalElements"
+      (mudarPagina)="irParaPagina($event)"
+    />
+  }
+</div>

@@ -1,0 +1,60 @@
+<div class="modal-header">
+  <h5 class="modal-title fw-bold">
+    <i class="fas fa-people-arrows text-primary me-2"></i>Reatribuir cliente
+  </h5>
+  <button type="button" class="btn-close" aria-label="Fechar" (click)="cancelar()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="alert alert-light border d-flex align-items-center mb-4">
+    <i class="fas fa-user text-primary me-3 fa-lg"></i>
+    <div>
+      <p class="fw-bold mb-0">{{ cliente.nome }}</p>
+      <small class="text-muted">Responsável atual: {{ cliente.vendedorNome }}</small>
+    </div>
+  </div>
+
+  <form [formGroup]="form">
+    <label class="form-label fw-bold" for="novoVendedor">Novo responsável *</label>
+    <select
+      id="novoVendedor"
+      class="form-select mb-1"
+      formControlName="novoVendedorId"
+      [class.is-invalid]="enviado() && novoVendedorId.invalid"
+    >
+      <option [ngValue]="null" disabled>Selecione um vendedor</option>
+      @for (vendedor of vendedoresDisponiveis(); track vendedor.id) {
+        <option [ngValue]="vendedor.id">{{ vendedor.nome }}</option>
+      }
+    </select>
+    @if (enviado() && novoVendedorId.invalid) {
+      <p class="text-danger small mb-3">
+        <i class="fas fa-circle-exclamation me-1"></i>Escolha o vendedor que vai assumir o cliente.
+      </p>
+    } @else {
+      <div class="mb-3"></div>
+    }
+
+    <mdb-form-control class="mb-1">
+      <textarea
+        mdbInput
+        id="motivo"
+        class="form-control"
+        rows="3"
+        formControlName="motivo"
+        maxlength="255"
+      ></textarea>
+      <label mdbLabel class="form-label" for="motivo">Motivo da transferência</label>
+    </mdb-form-control>
+    <small class="text-muted">
+      O motivo fica registrado no histórico de atribuições da conversa.
+    </small>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" mdbRipple (click)="cancelar()">Cancelar</button>
+  <button type="button" class="btn btn-primary" mdbRipple (click)="confirmar()">
+    <i class="fas fa-arrow-right-arrow-left me-2"></i>Reatribuir
+  </button>
+</div>

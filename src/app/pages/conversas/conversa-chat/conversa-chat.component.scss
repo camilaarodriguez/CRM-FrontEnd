@@ -1,0 +1,50 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 220px);
+  min-height: 420px;
+}
+
+.chat__painel {
+  overflow-y: auto;
+  background-color: #eef2f9;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.balao {
+  max-width: 76%;
+  padding: 0.65rem 0.9rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  word-break: break-word;
+}
+
+.balao--entrada {
+  background-color: #ffffff;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.balao--saida {
+  background-color: #d7e6ff;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.balao__hora,
+.balao__autor {
+  font-size: 0.72rem;
+  color: #6c757d;
+}
