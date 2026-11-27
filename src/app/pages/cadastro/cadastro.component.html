@@ -1,0 +1,156 @@
+<section class="login-page d-flex align-items-center justify-content-center min-vh-100 py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
+        <div class="card shadow-5-strong border-0">
+          <div class="card-body p-4 p-lg-5">
+            <div class="text-center mb-4">
+              <div class="login-page__icone bg-primary text-white shadow-3 mx-auto mb-3">
+                <i class="fas fa-user-plus fa-2x"></i>
+              </div>
+              <h4 class="fw-bold mb-1">Criar conta</h4>
+              <p class="text-muted mb-0">Cadastre-se para acessar o CRM</p>
+            </div>
+
+            @if (mensagemErro()) {
+              <div class="alert alert-danger" role="alert">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-circle-exclamation me-2"></i>{{ mensagemErro() }}
+                </div>
+                @if (detalhesErro().length) {
+                  <ul class="mb-0 mt-2 small">
+                    @for (detalhe of detalhesErro(); track detalhe) {
+                      <li>{{ detalhe }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+
+            <form [formGroup]="form" (ngSubmit)="cadastrar()" novalidate>
+              <mdb-form-control class="mb-1">
+                <input
+                  mdbInput
+                  type="text"
+                  id="nome"
+                  class="form-control"
+                  formControlName="nome"
+                  [class.is-invalid]="nome.touched && nome.invalid"
+                  autocomplete="name"
+                />
+                <label mdbLabel class="form-label" for="nome">Nome completo</label>
+              </mdb-form-control>
+              @if (nome.touched && nome.invalid) {
+                <p class="text-danger small mb-3">
+                  <i class="fas fa-circle-exclamation me-1"></i>
+                  @if (nome.hasError('required')) {
+                    O nome é obrigatório.
+                  } @else {
+                    O nome deve ter no máximo 150 caracteres.
+                  }
+                </p>
+              } @else {
+                <div class="mb-3"></div>
+              }
+
+              <mdb-form-control class="mb-1">
+                <input
+                  mdbInput
+                  type="email"
+                  id="email"
+                  class="form-control"
+                  formControlName="email"
+                  [class.is-invalid]="email.touched && email.invalid"
+                  autocomplete="email"
+                />
+                <label mdbLabel class="form-label" for="email">E-mail</label>
+              </mdb-form-control>
+              @if (email.touched && email.invalid) {
+                <p class="text-danger small mb-3">
+                  <i class="fas fa-circle-exclamation me-1"></i>
+                  @if (email.hasError('required')) {
+                    O e-mail é obrigatório.
+                  } @else {
+                    Informe um e-mail válido.
+                  }
+                </p>
+              } @else {
+                <div class="mb-3"></div>
+              }
+
+              <mdb-form-control class="mb-1">
+                <input
+                  mdbInput
+                  type="password"
+                  id="senha"
+                  class="form-control"
+                  formControlName="senha"
+                  [class.is-invalid]="senha.touched && senha.invalid"
+                  autocomplete="new-password"
+                />
+                <label mdbLabel class="form-label" for="senha">Senha</label>
+              </mdb-form-control>
+              @if (senha.touched && senha.invalid) {
+                <p class="text-danger small mb-3">
+                  <i class="fas fa-circle-exclamation me-1"></i>
+                  @if (senha.hasError('required')) {
+                    A senha é obrigatória.
+                  } @else if (senha.hasError('minlength')) {
+                    A senha deve ter no mínimo 6 caracteres.
+                  } @else {
+                    A senha deve ter no máximo 72 caracteres.
+                  }
+                </p>
+              } @else {
+                <div class="mb-3"></div>
+              }
+
+              <mdb-form-control class="mb-1">
+                <input
+                  mdbInput
+                  type="password"
+                  id="confirmacao"
+                  class="form-control"
+                  formControlName="confirmacao"
+                  [class.is-invalid]="(confirmacao.touched && confirmacao.invalid) || senhasDiferentes"
+                  autocomplete="new-password"
+                />
+                <label mdbLabel class="form-label" for="confirmacao">Confirmar senha</label>
+              </mdb-form-control>
+              @if (confirmacao.touched && confirmacao.hasError('required')) {
+                <p class="text-danger small mb-3">
+                  <i class="fas fa-circle-exclamation me-1"></i>Confirme a senha.
+                </p>
+              } @else if (senhasDiferentes) {
+                <p class="text-danger small mb-3">
+                  <i class="fas fa-circle-exclamation me-1"></i>As senhas não conferem.
+                </p>
+              } @else {
+                <div class="mb-3"></div>
+              }
+
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg w-100 shadow-3"
+                mdbRipple
+                [disabled]="form.invalid || enviando()"
+              >
+                @if (enviando()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Criando conta...
+                } @else {
+                  <i class="fas fa-user-plus me-2"></i>Criar conta
+                }
+              </button>
+            </form>
+
+            <p class="text-center text-muted mt-4 mb-0">
+              Já tem conta?
+              <a routerLink="/login" class="fw-bold">Entrar</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
