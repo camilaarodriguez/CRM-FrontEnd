@@ -1,11 +1,9 @@
 export const environment = {
   producao: false,
   /**
-   * URL base da API. As services consomem esta URL normalmente via HttpClient;
-   * enquanto o backend não estiver disponível, o mockApiInterceptor responde
-   * a estas mesmas rotas em memória.
+   * URL relativa: em desenvolvimento o `ng serve` repassa /api para o Spring Boot
+   * em localhost:8080 (veja proxy.conf.json), e em produção o Nginx faz o mesmo.
+   * Assim nenhum endereço de servidor fica fixo no código.
    */
-  apiUrl: '/api',
-  /** Quando true, o mockApiInterceptor intercepta as chamadas e simula o backend. */
-  usarApiMockada: true
+  apiUrl: '/api'
 };
