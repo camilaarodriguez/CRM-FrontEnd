@@ -19,7 +19,7 @@ import { Page, paginaVazia } from '../../../core/models/page.model';
 import { Usuario } from '../../../core/models/usuario.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClienteService } from '../../../core/services/cliente.service';
-import { NotificacaoService } from '../../../core/services/notificacao.service';
+import { NotificacaoService, escaparHtml } from '../../../core/services/notificacao.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { CarregandoComponent } from '../../../shared/components/carregando/carregando.component';
 import { EstadoVazioComponent } from '../../../shared/components/estado-vazio/estado-vazio.component';
@@ -221,7 +221,7 @@ export class ClienteListComponent implements OnInit {
   async excluir(cliente: Cliente): Promise<void> {
     const resposta = await this.notificacao.confirmarExclusao(
       'Excluir cliente',
-      `Tem certeza que deseja excluir <strong>${cliente.nome}</strong>?<br>
+      `Tem certeza que deseja excluir <strong>${escaparHtml(cliente.nome)}</strong>?<br>
        Ele sai da carteira, mas a conversa e o histórico de mensagens são preservados.`
     );
 

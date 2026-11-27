@@ -1,13 +1,9 @@
 export const environment = {
   producao: true,
-
-  /** URL base da API quando o backend estiver publicado. */
-  apiUrl: 'http://localhost:8080/api',
-
   /**
-   * Mantido como `true` para que a entrega funcione sem depender do backend.
-   * Ao subir a API, troque para `false`: as services passam a falar com o
-   * servidor real sem que nenhuma outra linha do projeto mude.
+   * URL relativa: o build é servido pelo Nginx da EC2, que encaminha /api para o
+   * Spring Boot na própria instância. O mesmo build funciona em qualquer IP ou
+   * domínio, sem endereço fixo no código.
    */
-  usarApiMockada: true
+  apiUrl: '/api'
 };

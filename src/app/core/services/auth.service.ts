@@ -1,101 +1,141 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, map, throwError } from 'rxjs';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { LoginResponse, RegistroRequest } from '../models/auth.model';
 import { UsuarioRole } from '../models/enums/usuario-role.enum';
-import { ErrorResponse } from '../models/error-response.model';
 import { Usuario } from '../models/usuario.model';
-import { UsuarioService } from './usuario.service';
+import { tratarErro } from '../utils/http-error.util';
 
-const CHAVE_SESSAO = 'crm.usuario';
+const CHAVE_SESSAO = 'crm.sessao';
+
+/** O que fica guardado no navegador entre recargas da página. */
+interface Sessao {
+  token: string;
+  /** Instante de expiração em milissegundos desde 1970 (UTC). */
+  expiraEm: number;
+  usuario: Usuario;
+}
 
 /**
- * Sessão do usuário logado.
+ * Sessão do usuário logado, baseada no JWT emitido pela API.
  *
- * O backend ainda não expõe endpoint de autenticação, então a senha é validada
- * localmente contra um valor de demonstração, conforme previsto nos critérios.
- * A identificação do usuário, porém, vem do UsuarioController via UsuarioService.
+ * O login e o cadastro chamam o AuthController (/api/auth). O token devolvido é
+ * guardado junto da data de expiração e enviado em toda requisição pelo
+ * authInterceptor. Quando o token vence, a sessão é encerrada e os guards mandam
+ * o usuário de volta para o login.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly usuarioService = inject(UsuarioService);
+  private readonly http = inject(HttpClient);
+  private readonly url = `${environment.apiUrl}/auth`;
 
-  /** Senha única aceita na demonstração, já que não há endpoint de login. */
-  private readonly senhaDemonstracao = '123456';
+  private readonly _sessao = signal<Sessao | null>(this.recuperarSessao());
 
-  private readonly _usuario = signal<Usuario | null>(this.recuperarSessao());
-
-  readonly usuario = this._usuario.asReadonly();
-  readonly autenticado = computed<boolean>(() => this._usuario() !== null);
-  readonly ehAdministrador = computed<boolean>(() => this._usuario()?.role === UsuarioRole.ADMIN);
-  readonly ehGerente = computed<boolean>(() => this._usuario()?.role === UsuarioRole.GERENTE);
-  readonly ehVendedor = computed<boolean>(() => this._usuario()?.role === UsuarioRole.VENDEDOR);
+  readonly usuario = computed<Usuario | null>(() => this._sessao()?.usuario ?? null);
+  readonly autenticado = computed<boolean>(() => this._sessao() !== null);
+  readonly ehAdministrador = computed<boolean>(() => this.usuario()?.role === UsuarioRole.ADMIN);
+  readonly ehGerente = computed<boolean>(() => this.usuario()?.role === UsuarioRole.GERENTE);
+  readonly ehVendedor = computed<boolean>(() => this.usuario()?.role === UsuarioRole.VENDEDOR);
 
   /** Quem pode distribuir carteira: administrador e gerente. */
   readonly podeDistribuir = computed<boolean>(
     () => this.ehAdministrador() || this.ehGerente()
   );
 
+  /** POST /api/auth/login */
   login(email: string, senha: string): Observable<Usuario> {
-    if (senha !== this.senhaDemonstracao) {
-      return throwError(() => this.credenciaisInvalidas());
-    }
+    return this.http
+      .post<LoginResponse>(`${this.url}/login`, { email, senha })
+      .pipe(
+        tratarErro('Não foi possível entrar'),
+        map((resposta) => this.iniciarSessao(resposta))
+      );
+  }
 
-    return this.usuarioService.listar({ busca: email }, { page: 0, size: 5 }).pipe(
-      map((pagina) => {
-        const alvo = email.trim().toLowerCase();
-        const usuario = pagina.content.find((item) => item.email.toLowerCase() === alvo);
-
-        if (!usuario) {
-          throw this.credenciaisInvalidas();
-        }
-        if (!usuario.ativo) {
-          throw this.usuarioInativo();
-        }
-
-        this._usuario.set(usuario);
-        localStorage.setItem(CHAVE_SESSAO, JSON.stringify(usuario));
-        return usuario;
-      })
-    );
+  /** POST /api/auth/registro: cria a conta e já entra no sistema. */
+  registrar(dados: RegistroRequest): Observable<Usuario> {
+    return this.http
+      .post<LoginResponse>(`${this.url}/registro`, dados)
+      .pipe(
+        tratarErro('Não foi possível criar a conta'),
+        map((resposta) => this.iniciarSessao(resposta))
+      );
   }
 
   logout(): void {
-    this._usuario.set(null);
+    this._sessao.set(null);
     localStorage.removeItem(CHAVE_SESSAO);
   }
 
-  private credenciaisInvalidas(): ErrorResponse {
-    return {
-      timestamp: new Date().toISOString(),
-      status: 401,
-      erro: 'Credenciais inválidas',
-      mensagem: 'E-mail ou senha incorretos. Confira os dados e tente novamente.',
-      caminho: '/login',
-      detalhes: []
-    };
+  /**
+   * Confere, no momento da chamada, se há uma sessão com token ainda válido.
+   * Se o token já venceu, encerra a sessão antes de responder.
+   */
+  sessaoValida(): boolean {
+    const sessao = this._sessao();
+    if (sessao === null) {
+      return false;
+    }
+    if (Date.now() >= sessao.expiraEm) {
+      this.logout();
+      return false;
+    }
+    return true;
   }
 
-  private usuarioInativo(): ErrorResponse {
-    return {
-      timestamp: new Date().toISOString(),
-      status: 403,
-      erro: 'Acesso bloqueado',
-      mensagem: 'Este usuário está inativo. Procure um administrador para reativar o acesso.',
-      caminho: '/login',
-      detalhes: []
-    };
+  /** Token para o cabeçalho Authorization, ou null quando não há sessão válida. */
+  token(): string | null {
+    return this.sessaoValida() ? (this._sessao()?.token ?? null) : null;
   }
 
-  private recuperarSessao(): Usuario | null {
+  private iniciarSessao(resposta: LoginResponse): Usuario {
+    const sessao: Sessao = {
+      token: resposta.token,
+      expiraEm: expiracaoDoToken(resposta.token) ?? Date.parse(resposta.expiraEm),
+      usuario: resposta.usuario
+    };
+    this._sessao.set(sessao);
+    localStorage.setItem(CHAVE_SESSAO, JSON.stringify(sessao));
+    return resposta.usuario;
+  }
+
+  private recuperarSessao(): Sessao | null {
     const bruto = localStorage.getItem(CHAVE_SESSAO);
     if (bruto === null) {
       return null;
     }
 
     try {
-      return JSON.parse(bruto) as Usuario;
+      const sessao = JSON.parse(bruto) as Sessao;
+      const valida =
+        typeof sessao.token === 'string' &&
+        typeof sessao.expiraEm === 'number' &&
+        sessao.usuario !== undefined &&
+        Date.now() < sessao.expiraEm;
+      if (!valida) {
+        localStorage.removeItem(CHAVE_SESSAO);
+        return null;
+      }
+      return sessao;
     } catch {
       localStorage.removeItem(CHAVE_SESSAO);
       return null;
     }
+  }
+}
+
+/**
+ * Lê a claim "exp" do payload do JWT (em segundos) e devolve em milissegundos.
+ * A assinatura não é conferida aqui: quem valida o token de verdade é a API.
+ */
+function expiracaoDoToken(token: string): number | null {
+  try {
+    const payload = token.split('.')[1];
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const exp = (JSON.parse(json) as { exp?: unknown }).exp;
+    return typeof exp === 'number' ? exp * 1000 : null;
+  } catch {
+    return null;
   }
 }

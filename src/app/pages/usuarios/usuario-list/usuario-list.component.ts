@@ -13,7 +13,7 @@ import {
 import { ErrorResponse } from '../../../core/models/error-response.model';
 import { Page, paginaVazia } from '../../../core/models/page.model';
 import { Usuario } from '../../../core/models/usuario.model';
-import { NotificacaoService } from '../../../core/services/notificacao.service';
+import { NotificacaoService, escaparHtml } from '../../../core/services/notificacao.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { CarregandoComponent } from '../../../shared/components/carregando/carregando.component';
 import { EstadoVazioComponent } from '../../../shared/components/estado-vazio/estado-vazio.component';
@@ -146,8 +146,8 @@ export class UsuarioListComponent implements OnInit {
     const resposta = await this.notificacao.confirmarAcao(
       ativando ? 'Reativar acesso' : 'Desativar acesso',
       ativando
-        ? `<strong>${usuario.nome}</strong> voltará a acessar o CRM e a receber clientes.`
-        : `<strong>${usuario.nome}</strong> deixará de acessar o CRM e de receber novos clientes.`,
+        ? `<strong>${escaparHtml(usuario.nome)}</strong> voltará a acessar o CRM e a receber clientes.`
+        : `<strong>${escaparHtml(usuario.nome)}</strong> deixará de acessar o CRM e de receber novos clientes.`,
       ativando ? 'Reativar' : 'Desativar'
     );
 
@@ -170,7 +170,7 @@ export class UsuarioListComponent implements OnInit {
   async excluir(usuario: Usuario): Promise<void> {
     const resposta = await this.notificacao.confirmarExclusao(
       'Excluir integrante',
-      `Tem certeza que deseja excluir <strong>${usuario.nome}</strong>?<br>
+      `Tem certeza que deseja excluir <strong>${escaparHtml(usuario.nome)}</strong>?<br>
        Só é possível excluir quem não tem clientes atribuídos.`
     );
 
