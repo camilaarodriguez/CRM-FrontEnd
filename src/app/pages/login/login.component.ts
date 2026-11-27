@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MdbFormsModule } from 'mdb-angular-ui-kit/forms';
 import { MdbRippleModule } from 'mdb-angular-ui-kit/ripple';
 import { ErrorResponse } from '../../core/models/error-response.model';
@@ -10,7 +10,7 @@ import { NotificacaoService } from '../../core/services/notificacao.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, MdbFormsModule, MdbRippleModule],
+  imports: [ReactiveFormsModule, RouterLink, MdbFormsModule, MdbRippleModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -41,10 +41,6 @@ export class LoginComponent {
     return this.form.controls.senha;
   }
 
-  preencherDemonstracao(email: string): void {
-    this.form.setValue({ email, senha: '123456' });
-  }
-
   entrar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -63,8 +59,9 @@ export class LoginComponent {
       },
       error: (erro: ErrorResponse) => {
         this.enviando.set(false);
+        // 401 (e-mail ou senha) e 403 (usuário inativo) ficam no próprio formulário;
+        // falha de rede ou de servidor já foi avisada pelo errorInterceptor.
         this.mensagemErro.set(erro.mensagem);
-        this.notificacao.erro(erro);
       }
     });
   }
